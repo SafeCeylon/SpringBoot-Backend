@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS AppUser (
+    id INT NOT NULL,
+    full_name VARCHAR(255) NOT NULL,
+    nic VARCHAR(255) NOT NULL,
+    mobile VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    district VARCHAR(255) NOT NULL,
+    gn_division VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);

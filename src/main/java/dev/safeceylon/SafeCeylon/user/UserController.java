@@ -28,38 +28,38 @@ public class UserController {
         return userRepository.findAll();
     }
 
-    @GetMapping("/{id}")
-    public User getUserById(@PathVariable Integer id) {
-        Optional<User> user = userRepository.findUserById(id);
-        if(user.isPresent()) {
-            return user.get();
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-        }
-    }
+    // @GetMapping("/{id}")
+    // public User getUserById(@PathVariable Integer id) {
+    //     Optional<User> user = userRepository.findUserById(id);
+    //     if(user.isPresent()) {
+    //         return user.get();
+    //     } else {
+    //         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+    //     }
+    // }
 
-    //POST /api/users
+    // //POST /api/users
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("")
-    void createUser(@RequestBody User user) {
-        userRepository.create(user);
-    }
+    // @ResponseStatus(HttpStatus.CREATED)
+    // @PostMapping("")
+    // void createUser(@RequestBody User user) {
+    //     userRepository.create(user);
+    // }
 
 
-    //PUT /api/users
+    // //PUT /api/users
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PutMapping("/{id}")
-    void updateUser(@RequestBody User user, @PathVariable Integer id) {
-        userRepository.update(user, id);
-    }
+    // @ResponseStatus(HttpStatus.NO_CONTENT)
+    // @PutMapping("/{id}")
+    // void updateUser(@RequestBody User user, @PathVariable Integer id) {
+    //     userRepository.update(user, id);
+    // }
     
-    //DELETE /api/users
+    // //DELETE /api/users
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/{id}")
-    void deleteUser(@PathVariable Integer id) {
-        userRepository.delete(id);
-    }
+    // @ResponseStatus(HttpStatus.NO_CONTENT)
+    // @DeleteMapping("/{id}")
+    // void deleteUser(@PathVariable Integer id) {
+    //     userRepository.delete(id);
+    // }
 }
