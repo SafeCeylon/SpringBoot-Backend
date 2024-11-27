@@ -27,10 +27,10 @@ public class D_Victim {
         @Column(nullable = false)
         private LocalDate reportedDate;
 
-      /*  @ManyToOne
+       @ManyToOne
         @JoinColumn(name = "shelterId")
         private Shelter shelter;
-*/
+
        // @ManyToOne
        // @JoinColumn(name = "assignedOfficerId")
        // private Officer assignedOfficer; // Foreign Key to Officer (Officer)

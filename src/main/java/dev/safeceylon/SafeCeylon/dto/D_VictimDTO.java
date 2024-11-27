@@ -1,6 +1,5 @@
 package dev.safeceylon.SafeCeylon.dto;
 
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,5 +19,5 @@ public class D_VictimDTO {
 
     private LocalDate reportedDate;
 
-    //private Long shelterId;
+    private Long shelterId;
 }
