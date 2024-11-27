@@ -1,4 +1,4 @@
-package dev.safeceylon.SafeCeylon.user;
+/*package dev.safeceylon.SafeCeylon.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,3 +12,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsById(String id);
     void deleteById(String id);
 }
+*/
