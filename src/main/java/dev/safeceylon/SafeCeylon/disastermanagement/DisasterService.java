@@ -23,23 +23,22 @@ public class DisasterService {
         return disasterRepository.findAll();
     }
 
-    public Disaster updateDisaster(String id, Disaster disaster) {
-//        Disaster existingDisaster = disasterRepository.findById(id).orElseThrow(
-//                () -> new IllegalAccessException("Disaster not found")
-//        );
-//        existingDisaster.setDisasterType(disaster.getDisasterType());
-//        existingDisaster.setLatitude(disaster.getLatitude());
-//        existingDisaster.setLongitude(disaster.getLongitude());
-//        existingDisaster.setRadius(disaster.getRadius());
-//        existingDisaster.setResolved(disaster.isResolved());
-//
-//        return disasterRepository.save(existingDisaster);
-        return null;
+    public Disaster updateDisaster(String id, Disaster disaster) throws IllegalAccessException {
+        Disaster existingDisaster = disasterRepository.findById(id).orElseThrow(
+                () -> new IllegalAccessException("Disaster not found")
+        );
+        existingDisaster.setType(disaster.getType());
+        existingDisaster.setLatitude(disaster.getLatitude());
+        existingDisaster.setLongitude(disaster.getLongitude());
+        existingDisaster.setRadius(disaster.getRadius());
+        existingDisaster.setResolved(disaster.isResolved());
+
+        return disasterRepository.save(existingDisaster);
 
     }
 
     public void deleteDisaster(String id) {
-//        disasterRepository.deleteById(id);
+        disasterRepository.deleteById(id);
     }
 
 }

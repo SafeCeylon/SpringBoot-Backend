@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface DisasterRepository extends JpaRepository<Disaster, Long> {
+public interface DisasterRepository extends JpaRepository<Disaster, String> {
 
     List<Disaster> id(String id);
 }

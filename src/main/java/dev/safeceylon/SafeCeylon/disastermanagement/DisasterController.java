@@ -30,7 +30,7 @@ public class DisasterController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Disaster> updateDisaster(@PathVariable String id, @RequestBody Disaster disaster) {
+    public ResponseEntity<Disaster> updateDisaster(@PathVariable String id, @RequestBody Disaster disaster) throws IllegalAccessException {
         Disaster updateDisaster = disasterService.updateDisaster(id, disaster);
         return ResponseEntity.ok(updateDisaster);
     }
