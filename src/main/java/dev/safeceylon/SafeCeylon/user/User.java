@@ -1,4 +1,4 @@
-package dev.safeceylon.SafeCeylon.user;
+/*package dev.safeceylon.SafeCeylon.user;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -171,3 +171,4 @@ public class User {
         this.twoFactorConfirmation = twoFactorConfirmation;
     }
 }
+*/

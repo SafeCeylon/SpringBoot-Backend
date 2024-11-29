@@ -1,4 +1,4 @@
-package dev.safeceylon.SafeCeylon.user;
+/*package dev.safeceylon.SafeCeylon.user;
 
 public enum UserRole {
     USER,
@@ -8,3 +8,4 @@ public enum UserRole {
     METEOROLOGY_ADMIN,
     METEOROLOGY_OFFICER
 }
+*/

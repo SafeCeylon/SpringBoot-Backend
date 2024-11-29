@@ -1,4 +1,4 @@
-package dev.safeceylon.SafeCeylon.user;
+/*package dev.safeceylon.SafeCeylon.user;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -72,3 +72,4 @@ public class UserController {
         userRepository.deleteById(id); // deleteById is provided by JpaRepository
     }
 }
+*/
