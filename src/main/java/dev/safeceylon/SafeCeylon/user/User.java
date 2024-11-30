@@ -1,6 +1,8 @@
 package dev.safeceylon.SafeCeylon.user;
 
 import jakarta.persistence.*;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
@@ -49,6 +51,10 @@ public class User {
     private Double longitude;
 
     private Double latitude;
+
+    private String resetToken;
+
+    private Instant tokenExpiry;
 
     // Getters and setters
     // Constructor(s)

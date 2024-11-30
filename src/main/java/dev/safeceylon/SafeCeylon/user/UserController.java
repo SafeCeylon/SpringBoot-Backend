@@ -1,19 +1,34 @@
 package dev.safeceylon.SafeCeylon.user;
 
+import dev.safeceylon.SafeCeylon.disastermanagement.Disaster;
+import dev.safeceylon.SafeCeylon.disastermanagement.DisasterRepository;
 import dev.safeceylon.SafeCeylon.util.JwtUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Map;
+import java.util.UUID;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @RestController
 @RequestMapping("/api/users")
@@ -43,8 +58,9 @@ public class UserController {
     //POST /api/users
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("")
+    @PostMapping("/register")
     void createUser(@RequestBody User user) {
+        System.out.println("User registration request received: " + user.getEmail());
         if (userRepository.findUserByEmail(user.getEmail()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
         }
@@ -53,6 +69,7 @@ public class UserController {
 
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest request) {
+        System.err.println("Login request received: " + request.getEmail() + " " + request.getPassword());
         // Find user by email
         Optional<User> userOptional = userRepository.findUserByEmail(request.getEmail());
         if (userOptional.isEmpty()) {
@@ -69,6 +86,99 @@ public class UserController {
         // Generate a response (e.g., JWT token or session info)
         String token = JwtUtils.generateToken(user.getId());
         return new LoginResponse(token, "Login successful");
+    }
+
+    @PostMapping("/userdata")
+    public User getUserData(@RequestHeader("Authorization") String authorization) {
+        System.out.println("Authorization header received: " + authorization);
+        String token = authorization.replace("Bearer ", "").trim(); // Extract the token part
+        String userId = JwtUtils.getUserIdFromToken(token);
+        Optional<User> userOptional = userRepository.findUserById(userId);
+        if (userOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
+        }
+        System.out.println("User data requested for: " + userOptional.get().getEmail());
+        return userOptional.get();
+    }
+
+    // For example, if you're using a session-based approach
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("Logout request received");
+        // Invalidate the session (if you're using sessions)
+        request.getSession().invalidate();
+        
+        // You can also add a message indicating successful logout
+        return ResponseEntity.ok("Logged out successfully");
+    }
+
+    @PostMapping("/password-reset")
+    public ResponseEntity<String> sendPasswordResetEmail(@RequestBody Map<String, String> request) {
+        System.out.println("Password reset request received: " + request.get("email"));
+        String email = request.get("email");
+
+        Optional<User> userOptional = userRepository.findUserByEmail(email);
+        if (userOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Email not registered");
+        }
+
+        User user = userOptional.get();
+        String resetToken = UUID.randomUUID().toString();
+        user.setResetToken(resetToken);
+        user.setTokenExpiry(Instant.now().plus(1, ChronoUnit.HOURS));
+        userRepository.save(user);
+
+        // Send the email (Use your EmailService here)
+        String resetLink = "http://your-frontend-url/reset-password?token=" + resetToken;
+        System.out.println("Reset link: " + resetLink); // For debugging
+
+        // Use an email service in production
+        return ResponseEntity.ok("Password reset link sent to your email");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> request) {
+        String token = request.get("token");
+        String newPassword = request.get("password");
+
+        Optional<User> userOptional = userRepository.findUserByResetToken(token);
+        if (userOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid or expired token");
+        }
+
+        User user = userOptional.get();
+
+        // Check if the token has expired
+        if (user.getTokenExpiry().isBefore(Instant.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token has expired");
+        }
+
+        // Update the password
+        user.setPassword(newPassword);
+        user.setResetToken(null);
+        user.setTokenExpiry(null);
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Password reset successfully");
+    }
+
+    @Autowired 
+    private DisasterRepository disasterRepository;
+
+    @PostMapping("/report-disaster")
+    public ResponseEntity<String> reportDisaster(@RequestBody Map<String, String> request) {
+        System.out.println("Disaster report request received: " + request.get("type"));
+
+        Disaster disaster = new Disaster();
+        disaster.setType(request.get("type"));
+        disaster.setLatitude(Double.parseDouble(request.get("latitude")));
+        disaster.setLongitude(Double.parseDouble(request.get("longitude")));
+        disaster.setRadius( 3);
+        disaster.setReportedAt(LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()));
+        disaster.setResolved(false);
+        disaster.setReportedBy("User");
+        disasterRepository.save(disaster);
+        return ResponseEntity.ok("Disaster reported successfully");
     }
 
     //PUT /api/users

@@ -29,9 +29,11 @@ public class Disaster {
     @Column(name = "resolved")
     private boolean resolved = false;
 
+    private String reportedBy;
+
     public Disaster() {}
 
-    public Disaster(String id, String type, String location, double latitude, double longitude, double radius, String details, LocalDateTime reportedAt, boolean resolved) {
+    public Disaster(String id, String type, String location, double latitude, double longitude, double radius, String details, LocalDateTime reportedAt, boolean resolved, String reportedBy) {
         this.id = id;
         this.type = type;
         this.latitude = latitude;
@@ -39,6 +41,7 @@ public class Disaster {
         this.radius = radius;
         this.reportedAt = reportedAt;
         this.resolved = resolved;
+        this.reportedBy = reportedBy;
     }
 
 }
