@@ -1,4 +1,12 @@
 package dev.safeceylon.SafeCeylon.metreologtdepartmentofficer;
 
-public interface MetreologyDepartmentOfficerRepo {
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.stereotype.Repository;
+
+@Repository
+@EnableJpaRepositories
+public interface MetreologyDepartmentOfficerRepo extends JpaRepository<MetreologyDepartmentOfficer, Long> {
+
+
 }
