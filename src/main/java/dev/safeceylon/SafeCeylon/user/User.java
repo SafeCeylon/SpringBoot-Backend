@@ -2,8 +2,12 @@ package dev.safeceylon.SafeCeylon.user;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
+
+@Setter
+@Getter
 @Entity
 @Table(name = "users")
 public class User {
@@ -42,6 +46,10 @@ public class User {
 
     private String twoFactorConfirmation;
 
+    private Double longitude;
+
+    private Double latitude;
+
     // Getters and setters
     // Constructor(s)
     // Additional utility methods if needed
@@ -50,7 +58,7 @@ public class User {
     public User() {}
 
     // Parameterized constructor
-    public User(String id, String name, String nic, String mobileNumber, String address, String email, LocalDateTime emailVerified, String image, String password, UserRole role, boolean isTwoFactorEnabled, String twoFactorConfirmation) {
+    public User(String id, String name, String nic, String mobileNumber, String address, String email, LocalDateTime emailVerified, String image, String password, UserRole role, boolean isTwoFactorEnabled, String twoFactorConfirmation, Double longitude, Double latitude) {
         this.id = id;
         this.name = name;
         this.nic = nic;
@@ -64,110 +72,11 @@ public class User {
         // this.accounts = accounts;
         this.isTwoFactorEnabled = isTwoFactorEnabled;
         this.twoFactorConfirmation = twoFactorConfirmation;
+        this.longitude = longitude;
+        this.latitude = latitude;
     }
-
-    // Getters and setters (or use Lombok annotations if desired)
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getNic() {
-        return nic;
-    }
-
-    public void setNic(String nic) {
-        this.nic = nic;
-    }
-
-    public String getMobileNumber() {
-        return mobileNumber;
-    }
-
-    public void setMobileNumber(String mobileNumber) {
-        this.mobileNumber = mobileNumber;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public LocalDateTime getEmailVerified() {
-        return emailVerified;
-    }
-
-    public void setEmailVerified(LocalDateTime emailVerified) {
-        this.emailVerified = emailVerified;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public UserRole getRole() {
-        return role;
-    }
-
-    public void setRole(UserRole role) {
-        this.role = role;
-    }
-
-    // public List<Account> getAccounts() {
-    //     return accounts;
-    // }
-
-    // public void setAccounts(List<Account> accounts) {
-    //     this.accounts = accounts;
-    // }
 
     public Boolean isTwoFactorEnabled() {
         return isTwoFactorEnabled;
-    }
-
-    public void setTwoFactorEnabled(Boolean isTwoFactorEnabled) {
-        this.isTwoFactorEnabled = isTwoFactorEnabled;
-    }
-
-    public String getTwoFactorConfirmation() {
-        return twoFactorConfirmation;
-    }
-
-    public void setTwoFactorConfirmation(String twoFactorConfirmation) {
-        this.twoFactorConfirmation = twoFactorConfirmation;
     }
 }

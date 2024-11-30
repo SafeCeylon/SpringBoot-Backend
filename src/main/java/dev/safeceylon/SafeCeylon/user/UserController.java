@@ -1,5 +1,6 @@
 package dev.safeceylon.SafeCeylon.user;
 
+import dev.safeceylon.SafeCeylon.util.JwtUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,9 +45,31 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("")
     void createUser(@RequestBody User user) {
+        if (userRepository.findUserByEmail(user.getEmail()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
+        }
         userRepository.save(user);
     }
 
+    @PostMapping("/login")
+    public LoginResponse login(@RequestBody LoginRequest request) {
+        // Find user by email
+        Optional<User> userOptional = userRepository.findUserByEmail(request.getEmail());
+        if (userOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+        }
+
+        User user = userOptional.get();
+
+        // Compare provided hashed password with the stored hashed password
+        if (!request.getPassword().equals(user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+        }
+
+        // Generate a response (e.g., JWT token or session info)
+        String token = JwtUtils.generateToken(user.getId());
+        return new LoginResponse(token, "Login successful");
+    }
 
     //PUT /api/users
 
