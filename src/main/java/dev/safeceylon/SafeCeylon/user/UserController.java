@@ -3,6 +3,8 @@ package dev.safeceylon.SafeCeylon.user;
 import dev.safeceylon.SafeCeylon.disastermanagement.Disaster;
 import dev.safeceylon.SafeCeylon.disastermanagement.DisasterRepository;
 import dev.safeceylon.SafeCeylon.shelterhospital.*;
+import dev.safeceylon.SafeCeylon.DisasterVictim.*;
+import dev.safeceylon.SafeCeylon.donations.*;
 import dev.safeceylon.SafeCeylon.util.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -72,10 +74,22 @@ public class UserController {
         Map<String, List<?>> mapData = Map.of("disasters", disasters, "shelters", shelters, "hospitals", hospitals);
         return ResponseEntity.ok(mapData);
     }
+    
+    @Autowired
+    private DisasterVictimRepository disasterVictimRepository;
 
     @GetMapping("/all-disasters")
-    public List<Disaster> getAllDisastersNotResolved(){
-        return disasterRepository.findUnresolvedDisasters();
+    public List<Disaster> getAllDisastersUserNotPartOf(@RequestHeader("Authorization") String authorization){
+        System.out.println("All disasters request received");
+        String token = authorization.replace("Bearer ", "").trim(); // Extract the token part
+        String userId = JwtUtils.getUserIdFromToken(token);
+        Optional<User> userOptional = userRepository.findUserById(userId);
+        if (userOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
+        }
+        List<Disaster> disasters = disasterVictimRepository.findDisastersUserNotPartOf(userId);
+    
+        return disasters;
     }
     
 
@@ -124,6 +138,29 @@ public class UserController {
         System.out.println("User data requested for: " + userOptional.get().getEmail());
         return userOptional.get();
     }
+
+    @PostMapping("/add-victim")
+    public ResponseEntity<Void> addVictim(@RequestHeader("Authorization") String authorization, @RequestBody Map<String, String> request) {
+        System.out.println("Add victim request received: " + request.get("disasterId"));
+        String token = authorization.replace("Bearer ", "").trim(); // Extract the token part
+        String userId = JwtUtils.getUserIdFromToken(token);
+        Optional<User> userOptional = userRepository.findUserById(userId);
+        if (userOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
+        }
+        User user = userOptional.get();
+        // Save the DisasterVictim entry
+        DisasterVictim disasterVictim = new DisasterVictim(
+            user.getId(),                      // idVictim
+            request.get("disasterId"),         // idDisaster
+            VictimStatus.ToReply               // victimStatus
+        );
+    
+        disasterVictimRepository.save(disasterVictim);
+    
+        return ResponseEntity.ok().build();
+    }
+    
 
     // For example, if you're using a session-based approach
     @PostMapping("/logout")
@@ -200,6 +237,26 @@ public class UserController {
         disaster.setReportedBy("USER");
         disasterRepository.save(disaster);
         return ResponseEntity.ok("Disaster reported successfully");
+    }
+
+    @Autowired
+    private MonetaryDonationRepository monetaryDonationsRepository;
+
+    @PostMapping("/add-mono-donation")
+    public ResponseEntity<String> addMonoDonation(@RequestHeader("Authorization") String authorization, @RequestBody Map<String, String> request) {
+        System.out.println("Mono donation request received: " + request.get("amount"));
+        String token = authorization.replace("Bearer ", "").trim(); // Extract the token part
+        String userId = JwtUtils.getUserIdFromToken(token);
+        Optional<User> userOptional = userRepository.findUserById(userId);
+        if (userOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
+        }
+        MonetaryDonation donation = new MonetaryDonation(
+            userOptional.get().getId(), // idDonor
+            Double.parseDouble(request.get("amount")) // amount
+        );
+        monetaryDonationsRepository.save(donation);
+        return ResponseEntity.ok("Donation added successfully");
     }
 
     //PUT /api/users
