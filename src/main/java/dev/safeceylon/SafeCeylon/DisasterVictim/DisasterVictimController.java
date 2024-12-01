@@ -31,6 +31,16 @@ public class DisasterVictimController {
 
 
 //    @GetMapping("/chat-ToReply")
+//    public List<User> getVictimsToReply(@RequestParam(value = "UserId", required = false) String UserId){
+//        System.out.println("userId: " + UserId); // Ensure it's logged
+//
+//            List<User> victimsToReply =disasterVictimService.GetVictimUsersOfStatus(VictimStatus.ToReply);
+//            return victimsToReply;  //
+//
+//    }
+
+
+    //    @GetMapping("/chat-ToReply")
     @GetMapping(value="/chat-ToReply")
     public List<User> getVictimsToReply(@RequestParam(value = "UserId", required = false) String UserId) {
         System.out.println("userId: " + UserId); // Ensure it's logged
@@ -42,6 +52,7 @@ public class DisasterVictimController {
             return victimsToReply;  // Ensure you're returning the correct data
         }
     }
+
 
 
 
