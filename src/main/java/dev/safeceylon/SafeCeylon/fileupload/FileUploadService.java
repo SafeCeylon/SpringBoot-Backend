@@ -1,5 +1,6 @@
 package dev.safeceylon.SafeCeylon.fileupload;
 
+import dev.safeceylon.SafeCeylon.airquality.AirQualityService;
 import dev.safeceylon.SafeCeylon.flood.FloodWarningService;
 import dev.safeceylon.SafeCeylon.landslide.LandslideWarningService;
 import dev.safeceylon.SafeCeylon.weather.WeatherReportService;
@@ -28,12 +29,14 @@ public class FileUploadService {
     private final WeatherReportService weatherReportService;
     private final LandslideWarningService landslideWarningService;
     private final FloodWarningService floodWarningService;
+    private final AirQualityService airQualityService;
 
     @Autowired
-    public FileUploadService(WeatherReportService weatherReportService, LandslideWarningService landslideWarningService, FloodWarningService floodWarningService) {
+    public FileUploadService(WeatherReportService weatherReportService, LandslideWarningService landslideWarningService, FloodWarningService floodWarningService, AirQualityService airQualityService) {
         this.weatherReportService = weatherReportService;
         this.landslideWarningService = landslideWarningService;
         this.floodWarningService = floodWarningService;
+        this.airQualityService = airQualityService;
     }
 
     public ResponseEntity<String> handleFileUpload(MultipartFile file, String fileType) {
@@ -70,8 +73,11 @@ public class FileUploadService {
             }
 
             if ("flood warning".equalsIgnoreCase(fileType)) {
-                System.out.println("inside flood warning" + fileType);
                 floodWarningService.saveFloodData(mainPath);
+            }
+
+            if ("quality status".equalsIgnoreCase(fileType)) {
+                airQualityService.saveAirQualityFromFile(destinationFile);
             }
 
             return ResponseEntity.ok("File uploaded and processed successfully as " + newFileName);
