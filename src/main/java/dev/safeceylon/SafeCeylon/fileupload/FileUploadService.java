@@ -1,5 +1,6 @@
 package dev.safeceylon.SafeCeylon.fileupload;
 
+import dev.safeceylon.SafeCeylon.flood.FloodWarningService;
 import dev.safeceylon.SafeCeylon.landslide.LandslideWarningService;
 import dev.safeceylon.SafeCeylon.weather.WeatherReportService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +27,13 @@ public class FileUploadService {
 
     private final WeatherReportService weatherReportService;
     private final LandslideWarningService landslideWarningService;
+    private final FloodWarningService floodWarningService;
 
     @Autowired
-    public FileUploadService(WeatherReportService weatherReportService, LandslideWarningService landslideWarningService) {
+    public FileUploadService(WeatherReportService weatherReportService, LandslideWarningService landslideWarningService, FloodWarningService floodWarningService) {
         this.weatherReportService = weatherReportService;
         this.landslideWarningService = landslideWarningService;
+        this.floodWarningService = floodWarningService;
     }
 
     public ResponseEntity<String> handleFileUpload(MultipartFile file, String fileType) {
@@ -50,7 +53,8 @@ public class FileUploadService {
         }
 
         String newFileName = generateFileName(fileType, file.getOriginalFilename());
-        String filePath = BASE_UPLOAD_DIR + subDir + "/" + newFileName;
+        String mainPath = subDir + "/" + newFileName;
+        String filePath = BASE_UPLOAD_DIR + mainPath;
         File destinationFile = new File(filePath);
 
         try {
@@ -63,6 +67,11 @@ public class FileUploadService {
 
             if ("landslide warning".equalsIgnoreCase(fileType)) {
                 landslideWarningService.saveLandslideWarningsFromFile(destinationFile);
+            }
+
+            if ("flood warning".equalsIgnoreCase(fileType)) {
+                System.out.println("inside flood warning" + fileType);
+                floodWarningService.saveFloodData(mainPath);
             }
 
             return ResponseEntity.ok("File uploaded and processed successfully as " + newFileName);
