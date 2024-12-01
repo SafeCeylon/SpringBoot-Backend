@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 
 @RestController
 @RequestMapping("/api/users")
@@ -242,6 +243,9 @@ public class UserController {
     @Autowired
     private MonetaryDonationRepository monetaryDonationsRepository;
 
+    @Autowired
+    private SupplyDonationRepository supplyDonationsRepository;
+
     @PostMapping("/add-mono-donation")
     public ResponseEntity<String> addMonoDonation(@RequestHeader("Authorization") String authorization, @RequestBody Map<String, String> request) {
         System.out.println("Mono donation request received: " + request.get("amount"));
@@ -256,6 +260,53 @@ public class UserController {
             Double.parseDouble(request.get("amount")) // amount
         );
         monetaryDonationsRepository.save(donation);
+        return ResponseEntity.ok("Donation added successfully");
+    }
+
+    @PostMapping("/add-sup-donation")
+    public ResponseEntity<String> addSupDonation(
+            @RequestHeader("Authorization") String authorization, 
+            @RequestBody Map<String, Object> request) {
+    
+        System.out.println("Sup donation request received: " + request);
+    
+        String token = authorization.replace("Bearer ", "").trim();
+        String userId = JwtUtils.getUserIdFromToken(token);
+        Optional<User> userOptional = userRepository.findUserById(userId);
+        if (userOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
+        }
+    
+        String item = (String) request.get("supplies");
+        if (item == null || item.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Supplies field is required");
+        }
+    
+        String amountStr = (String) request.get("quantity");
+        double quantity;
+        try {
+            quantity = Double.parseDouble(amountStr);
+        } catch (NumberFormatException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid quantity format");
+        }
+    
+        String dateStr = (String) request.get("date");
+        java.sql.Date date;
+        try {
+            date = java.sql.Date.valueOf(dateStr.split("T")[0]); // Convert ISO date to java.sql.Date
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date format");
+        }
+    
+        SupplyDonation donation = new SupplyDonation(
+            userOptional.get().getId(),  // idDonor
+            item,                       // supplies
+            quantity,                   // quantity
+            date                        // date
+        );
+        System.out.println("Donation: " + donation);
+        supplyDonationsRepository.save(donation);
+    
         return ResponseEntity.ok("Donation added successfully");
     }
 
