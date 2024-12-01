@@ -77,9 +77,6 @@ public class UserController {
     public List<Disaster> getAllDisastersNotResolved(){
         return disasterRepository.findUnresolvedDisasters();
     }
-    
-
-    //POST /api/users
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register")
