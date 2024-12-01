@@ -1,6 +1,5 @@
-package dev.safeceylon.SafeCeylon.reportmanagement;
+package dev.safeceylon.SafeCeylon.weather;
 
-import dev.safeceylon.SafeCeylon.reportmanagement.WeatherReport;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

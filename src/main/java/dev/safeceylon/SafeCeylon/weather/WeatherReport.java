@@ -1,4 +1,4 @@
-package dev.safeceylon.SafeCeylon.reportmanagement;
+package dev.safeceylon.SafeCeylon.weather;
 
 import jakarta.persistence.*;
 import lombok.Getter;

@@ -1,6 +1,8 @@
 package dev.safeceylon.SafeCeylon.fileupload;
 
-import dev.safeceylon.SafeCeylon.reportmanagement.WeatherReportService;
+import dev.safeceylon.SafeCeylon.landslide.LandslideWarningService;
+import dev.safeceylon.SafeCeylon.weather.WeatherReportService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,8 +25,12 @@ public class FileUploadService {
     private static final String BASE_UPLOAD_DIR = "D:/2 - My Projects/SpringBoot-Backend/uploads/";
 
     private final WeatherReportService weatherReportService;
-    public FileUploadService(WeatherReportService weatherReportService) {
+    private final LandslideWarningService landslideWarningService;
+
+    @Autowired
+    public FileUploadService(WeatherReportService weatherReportService, LandslideWarningService landslideWarningService) {
         this.weatherReportService = weatherReportService;
+        this.landslideWarningService = landslideWarningService;
     }
 
     public ResponseEntity<String> handleFileUpload(MultipartFile file, String fileType) {
@@ -53,6 +59,10 @@ public class FileUploadService {
             // Process weather reports if file type is "weather report"
             if ("weather report".equalsIgnoreCase(fileType)) {
                 weatherReportService.saveWeatherReportsFromFile(destinationFile);
+            }
+
+            if ("landslide warning".equalsIgnoreCase(fileType)) {
+                landslideWarningService.saveLandslideWarningsFromFile(destinationFile);
             }
 
             return ResponseEntity.ok("File uploaded and processed successfully as " + newFileName);
