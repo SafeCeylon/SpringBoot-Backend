@@ -24,6 +24,10 @@ public class FileUploadController {
         }
 
         // Get the response from the service and return it directly
-        return fileUploadService.handleFileUpload(file, fileType);
+        try {
+            return fileUploadService.handleFileUpload(file, fileType);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error: " + e.getMessage());
+        }
     }
 }
