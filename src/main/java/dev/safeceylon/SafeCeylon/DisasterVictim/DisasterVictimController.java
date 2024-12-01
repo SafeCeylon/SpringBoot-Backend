@@ -1,8 +1,7 @@
 package dev.safeceylon.SafeCeylon.DisasterVictim;
 
+import dev.safeceylon.SafeCeylon.disastermanagement.Disaster;
 import dev.safeceylon.SafeCeylon.user.User;
-import jakarta.annotation.Nullable;
-import jakarta.persistence.Tuple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,28 +29,20 @@ public class DisasterVictimController {
     }
 
 
-//    @GetMapping("/chat-ToReply")
-//    public List<User> getVictimsToReply(@RequestParam(value = "UserId", required = false) String UserId){
-//        System.out.println("userId: " + UserId); // Ensure it's logged
-//
-//            List<User> victimsToReply =disasterVictimService.GetVictimUsersOfStatus(VictimStatus.ToReply);
-//            return victimsToReply;  //
-//
-//    }
-
-
-    //    @GetMapping("/chat-ToReply")
-    @GetMapping(value="/chat-ToReply")
-    public List<User> getVictimsToReply(@RequestParam(value = "UserId", required = false) String UserId) {
-        System.out.println("userId: " + UserId); // Ensure it's logged
-        if(Objects.equals(UserId, "null")){
+    @GetMapping("/chat-ToReply")
+    public Object getVictimsToReplyChatAndDetails(@RequestParam(value = "UserId", required = false) String UserId){
+        if(UserId == null){
             List<User> victimsToReply =disasterVictimService.GetVictimUsersOfStatus(VictimStatus.ToReply);
-            return victimsToReply;  // Ensure you're returning the correct data
-        }else{
-            List<User> victimsToReply =disasterVictimService.GetVictimUsersOfStatus(VictimStatus.ToReply);
-            return victimsToReply;  // Ensure you're returning the correct data
+            return victimsToReply;  //
+        }else {
+            System.out.println("userId: " + UserId + "reponce"); // Ensure it's logged
+            return disasterVictimService.GetDisasterByVictimId(UserId);
         }
     }
+
+
+
+
 
 
 
