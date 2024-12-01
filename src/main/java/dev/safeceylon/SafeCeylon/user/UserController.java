@@ -2,6 +2,7 @@ package dev.safeceylon.SafeCeylon.user;
 
 import dev.safeceylon.SafeCeylon.disastermanagement.Disaster;
 import dev.safeceylon.SafeCeylon.disastermanagement.DisasterRepository;
+import dev.safeceylon.SafeCeylon.shelterhospital.*;
 import dev.safeceylon.SafeCeylon.util.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Map;
 import java.util.UUID;
+import java.util.List;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -54,6 +56,34 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
     }
+
+    @Autowired 
+    private DisasterRepository disasterRepository;
+
+    @Autowired
+    private ShelterRepository shelterRepository;
+
+    @Autowired
+    private HospitalRepository hospitalRepository;
+
+    @GetMapping("/map")
+    public ResponseEntity<Map<String, List<?>>> getAllMapData() {
+        System.out.println("Map request received");
+        List<Disaster> disasters = disasterRepository.findDisastersNotReportedBy("USER");
+        List<Shelter> shelters = shelterRepository.findAll();
+        List<Hospital> hospitals = hospitalRepository.findAll();
+        System.out.println("Disasters found: " + disasters.size());
+        System.out.println("Shelters found: " + shelters.size());
+        System.out.println("Hospitals found: " + hospitals.size());
+        Map<String, List<?>> mapData = Map.of("disasters", disasters, "shelters", shelters, "hospitals", hospitals);
+        return ResponseEntity.ok(mapData);
+    }
+
+    @GetMapping("/all-disasters")
+    public List<Disaster> getAllDisastersNotResolved(){
+        return disasterRepository.findUnresolvedDisasters();
+    }
+    
 
     //POST /api/users
 
@@ -129,7 +159,7 @@ public class UserController {
         userRepository.save(user);
 
         // Send the email (Use your EmailService here)
-        String resetLink = "http://your-frontend-url/reset-password?token=" + resetToken;
+        String resetLink = "http://frontend-url/reset-password?token=" + resetToken;
         System.out.println("Reset link: " + resetLink); // For debugging
 
         // Use an email service in production
@@ -162,9 +192,6 @@ public class UserController {
         return ResponseEntity.ok("Password reset successfully");
     }
 
-    @Autowired 
-    private DisasterRepository disasterRepository;
-
     @PostMapping("/report-disaster")
     public ResponseEntity<String> reportDisaster(@RequestBody Map<String, String> request) {
         System.out.println("Disaster report request received: " + request.get("type"));
@@ -176,7 +203,7 @@ public class UserController {
         disaster.setRadius( 3);
         disaster.setReportedAt(LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()));
         disaster.setResolved(false);
-        disaster.setReportedBy("User");
+        disaster.setReportedBy("USER");
         disasterRepository.save(disaster);
         return ResponseEntity.ok("Disaster reported successfully");
     }
