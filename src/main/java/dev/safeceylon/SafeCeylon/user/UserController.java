@@ -5,6 +5,7 @@ import dev.safeceylon.SafeCeylon.disastermanagement.DisasterRepository;
 import dev.safeceylon.SafeCeylon.shelterhospital.*;
 import dev.safeceylon.SafeCeylon.DisasterVictim.*;
 import dev.safeceylon.SafeCeylon.donations.*;
+import dev.safeceylon.SafeCeylon.notification.*;
 import dev.safeceylon.SafeCeylon.util.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -92,6 +93,22 @@ public class UserController {
     
         return disasters;
     }
+
+    @Autowired
+    private NotificationRepository notificationRepository;
+    
+    @GetMapping("/get-notifications")
+    public List<Notification> getNotifications(@RequestHeader("Authorization") String authorization) {
+        System.out.println("Get notifications request received");
+        String token = authorization.replace("Bearer ", "").trim(); // Extract the token part
+        String userId = JwtUtils.getUserIdFromToken(token);
+        Optional<User> userOptional = userRepository.findUserById(userId);
+        if (userOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
+        }
+        return notificationRepository.findUnclearedNotificationsByUserId(userId);
+    }
+
     
 
     //POST /api/users
@@ -159,6 +176,26 @@ public class UserController {
     
         disasterVictimRepository.save(disasterVictim);
     
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/clear-notification")
+    public ResponseEntity<Void> clearNotification(@RequestHeader("Authorization") String authorization, @RequestBody Map<String, String> request) {
+        System.out.println("Clear notification request received: " + request.get("notificationId"));
+        String token = authorization.replace("Bearer ", "").trim(); // Extract the token part
+        String userId = JwtUtils.getUserIdFromToken(token);
+        Optional<User> userOptional = userRepository.findUserById(userId);
+        if (userOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
+        }
+        String notificationId = request.get("notificationId");
+        Optional<Notification> notificationOptional = notificationRepository.findById(notificationId);
+        if (notificationOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Notification not found");
+        }
+        Notification notification = notificationOptional.get();
+        notification.setCleared(true);
+        notificationRepository.save(notification);
         return ResponseEntity.ok().build();
     }
     
