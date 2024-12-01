@@ -6,6 +6,8 @@ import dev.safeceylon.SafeCeylon.shelterhospital.*;
 import dev.safeceylon.SafeCeylon.DisasterVictim.*;
 import dev.safeceylon.SafeCeylon.donations.*;
 import dev.safeceylon.SafeCeylon.notification.*;
+import dev.safeceylon.SafeCeylon.weather.*;
+import dev.safeceylon.SafeCeylon.landslide.*;
 import dev.safeceylon.SafeCeylon.util.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,6 +22,7 @@ import java.util.UUID;
 import java.util.List;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +30,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 @RestController
@@ -109,6 +113,33 @@ public class UserController {
         return notificationRepository.findUnclearedNotificationsByUserId(userId);
     }
 
+    @Autowired
+    private WeatherReportRepository weatherReportRepository;
+
+    @GetMapping("/get-weather")
+    public List<WeatherReport> getWeatherData() {
+        System.out.println("Get weather request received");
+        // Get today's and tomorrow's dates
+        LocalDate today = LocalDate.now();
+        LocalDate tomorrow = today.plusDays(1);
+
+        // Format the dates to match your database format (e.g., "yyyy-MM-dd")
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String todayDate = today.format(formatter);
+        String tomorrowDate = tomorrow.format(formatter);
+
+        // Fetch and return today's and tomorrow's reports
+        return weatherReportRepository.findReportsForTodayAndTomorrow(todayDate, tomorrowDate);
+    }
+
+    @Autowired
+    private LandslideWarningRepository landslideWarningRepository;
+
+    @GetMapping("/disaster-data")
+    public List<LandslideWarning> getLandslideWarnings() {
+        System.out.println("Get disaster data request received");
+        return landslideWarningRepository.findAll();
+    }
     
 
     //POST /api/users
