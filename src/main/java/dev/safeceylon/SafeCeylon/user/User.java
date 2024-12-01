@@ -6,10 +6,10 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
+import java.util.List;
 
-
-@Setter
 @Getter
+@Setter
 @Entity
 @Table(name = "users")
 public class User {
@@ -17,22 +17,20 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID) // Assuming PostgreSQL is using UUID
     private String id;
-
     private String name;
     private String nic;
+    private String address;
+    private String twoFactorConfirmation;
+    private String image;
 
     @Column(name = "mobile_number")
     private String mobileNumber;
-
-    private String address;
 
     @Column(unique = true)
     private String email;
 
     @Column(name = "email_verified")
     private LocalDateTime emailVerified;
-
-    private String image;
 
     @Column(columnDefinition = "TEXT")
     private String password;
@@ -46,7 +44,6 @@ public class User {
     @Column(name = "is_two_factor_enabled")
     private Boolean isTwoFactorEnabled = false;
 
-    private String twoFactorConfirmation;
 
     private Double longitude;
 
@@ -60,7 +57,6 @@ public class User {
     // Constructor(s)
     // Additional utility methods if needed
 
-    // Default constructor
     public User() {}
 
     // Parameterized constructor
