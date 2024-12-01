@@ -96,4 +96,8 @@ public class DisasterVictimService {
         System.out.println("disasters.size() ----->>: " + disasters.size());
         return disasters;
     }
+
+    public User GetUserByVictimId(String id) {
+        return userRepository.findUserById(id).orElse(null);
+    }
 }
