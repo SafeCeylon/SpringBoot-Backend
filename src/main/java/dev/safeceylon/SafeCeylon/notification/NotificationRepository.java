@@ -12,8 +12,10 @@ import dev.safeceylon.SafeCeylon.notification.Notification;
 public interface NotificationRepository extends JpaRepository<Notification, String> {
     // Additional query methods can be added if needed
 
-    @Query("SELECT n FROM Notification n WHERE n.idUser = :userId AND n.cleared = false")
+    @Query("SELECT n FROM Notification n WHERE n.userId = :userId AND n.cleared = false")
     List<Notification> findUnclearedNotificationsByUserId(@Param("userId") String userId);
 
+    @Query("SELECT n FROM Notification n WHERE n.userId = :userId AND n.title = :title")
+    List<Notification> findByUserIdAndTitle(@Param("userId") String userId, @Param("title") String title);
 
 }

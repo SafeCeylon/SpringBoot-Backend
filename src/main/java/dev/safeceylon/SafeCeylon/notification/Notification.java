@@ -20,17 +20,17 @@ public class Notification {
     private String message;
     private Date date;
     private String threatLevel;
-    private String idUser;
+    private String userId;
     private String status;
     private Boolean cleared;
 
     public Notification() { }
 
-    public Notification(String title, String message, Date date, String idUser, String threatLevel, String status, Boolean cleared) {
+    public Notification(String title, String message, Date date, String userId, String threatLevel, String status, Boolean cleared) {
         this.title = title;
         this.message = message;
         this.date = date;
-        this.idUser = idUser;
+        this.userId = userId;
         this.threatLevel = threatLevel;
         this.status = status;
         this.cleared = cleared;
