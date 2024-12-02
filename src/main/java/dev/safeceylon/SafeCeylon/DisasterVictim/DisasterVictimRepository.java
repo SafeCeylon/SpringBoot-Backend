@@ -37,5 +37,6 @@ public interface DisasterVictimRepository extends JpaRepository<DisasterVictim, 
     @Query("UPDATE DisasterVictim dv SET dv.victimStatus = :status WHERE dv.idVictim = :idVictim")
     void updateVictimStatus(@Param("idVictim") String idVictim, @Param("status") VictimStatus status);
 
+    float countByVictimStatus(VictimStatus victimStatus);
 }
 
