@@ -62,14 +62,11 @@ public class DisasterVictimController {
             }
 
             User user = disasterVictimService.GetUserByVictimId(UserId);
-            System.out.println("User: " + user.getName());
             List<Disaster> disasterList = disasterVictimService.GetDisasterByVictimId(UserId);
-            System.out.println("Disasters: " + disasterList);
             List<Map<String, Object>> Chatmasages = chatService.getChatMessages(UserId);
-            System.out.println("Chat messages: " + Chatmasages);
 
 
-            ChatData chatData = new ChatData(user.getName(), disasterList, Chatmasages);
+            ChatData chatData = new ChatData(user.getName(), disasterList, Chatmasages, user.getImage(), user.getMobileNumber(), user.getAddress(), user.getEmail());
 
             return chatData;
 
