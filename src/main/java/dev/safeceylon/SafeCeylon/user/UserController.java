@@ -8,6 +8,8 @@ import dev.safeceylon.SafeCeylon.donations.*;
 import dev.safeceylon.SafeCeylon.notification.*;
 import dev.safeceylon.SafeCeylon.weather.*;
 import dev.safeceylon.SafeCeylon.landslide.*;
+import dev.safeceylon.SafeCeylon.airquality.*;
+import dev.safeceylon.SafeCeylon.flood.*;
 import dev.safeceylon.SafeCeylon.util.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -139,6 +141,15 @@ public class UserController {
     public List<LandslideWarning> getLandslideWarnings() {
         System.out.println("Get disaster data request received");
         return landslideWarningRepository.findAll();
+    }
+
+    @Autowired
+    private AirQualityRepository airQualityRepository;
+
+    @GetMapping("/air-quality")
+    public List<AirQuality> getAirQualityData() {
+        System.out.println("Get air quality request received");
+        return airQualityRepository.findAll();
     }
     
 
