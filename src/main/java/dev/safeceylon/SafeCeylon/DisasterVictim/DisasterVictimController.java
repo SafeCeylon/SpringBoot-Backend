@@ -39,10 +39,34 @@ public class DisasterVictimController {
     }
 
 
-    @GetMapping("/chat-ToReply")
-    public Object getVictimsToReplyChatAndDetails(@RequestParam(value = "UserId", required = false) String UserId){
-        if(UserId == null){
-            List<User> victimsToReply =disasterVictimService.GetVictimUsersOfStatus(VictimStatus.ToReply);
+    // http://localhost:3000/disaster/disaster-victims/chat?UserId=123&Type=ToReply
+    // @GetMapping("/chat-ToReply")
+    @GetMapping("/chat")
+    public Object getVictimsToReplyChatAndDetails(@RequestParam String UserId, @RequestParam(required = false) String Type) {
+        System.out.println("UserId: " + UserId);
+        System.out.println("Type: " + Type);
+        if(Objects.equals(UserId, "null")){
+            List<User> victimsToReply;
+            switch (Type) {
+                case "ToReply":
+                    victimsToReply = disasterVictimService.GetVictimUsersOfStatus(VictimStatus.ToReply);
+                    System.out.println("in page ToReply");
+                    break;
+                case "Replied":
+                    victimsToReply = disasterVictimService.GetVictimUsersOfStatus(VictimStatus.Replied);
+                    System.out.println("in page Replied");
+                    break;
+                case "Closed":
+                    victimsToReply = disasterVictimService.GetVictimUsersOfStatus(VictimStatus.Closed);
+                    System.out.println("in page Closed");
+                    break;
+                default:
+                    victimsToReply = disasterVictimService.GetVictimUsersOfStatus(VictimStatus.ToReply);
+                    System.out.println("in page default");
+                    break;
+            }
+
+            // List<User> victimsToReply =disasterVictimService.GetVictimUsersOfStatus(VictimStatus.ToReply);
             return victimsToReply;  //
         }else {
             System.out.println("userId: " + UserId + "reponce"); // Ensure it's logged
