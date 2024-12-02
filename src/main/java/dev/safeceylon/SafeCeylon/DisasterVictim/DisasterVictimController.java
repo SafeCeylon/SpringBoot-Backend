@@ -64,9 +64,10 @@ public class DisasterVictimController {
             User user = disasterVictimService.GetUserByVictimId(UserId);
             List<Disaster> disasterList = disasterVictimService.GetDisasterByVictimId(UserId);
             List<Map<String, Object>> Chatmasages = chatService.getChatMessages(UserId);
-
-
             ChatData chatData = new ChatData(user.getName(), disasterList, Chatmasages, user.getImage(), user.getMobileNumber(), user.getAddress(), user.getEmail());
+
+            // change the status of the victim to replied
+            disasterVictimService.changeVictimStatus(UserId, VictimStatus.Replied);
 
             return chatData;
 

@@ -1,7 +1,9 @@
 package dev.safeceylon.SafeCeylon.DisasterVictim;
 
 import dev.safeceylon.SafeCeylon.disastermanagement.Disaster;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -29,6 +31,11 @@ public interface DisasterVictimRepository extends JpaRepository<DisasterVictim, 
     // join disaster table with disasterVictim table
     List<Disaster> findDisastersByIdVictim(String idVictim);
 
+    // search all entries in the disaster victim table by the victim id and set the status to replied
+    @Modifying
+    @Transactional
+    @Query("UPDATE DisasterVictim dv SET dv.victimStatus = :status WHERE dv.idVictim = :idVictim")
+    void updateVictimStatus(@Param("idVictim") String idVictim, @Param("status") VictimStatus status);
 
 }
 
