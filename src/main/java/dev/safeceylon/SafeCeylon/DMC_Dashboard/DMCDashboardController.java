@@ -26,10 +26,10 @@ public class DMCDashboardController {
         dashboard.setDisasterVictimStatusClosedCount(dmcDashboardService.getDisasterVictimStatusClosedCount());
         dashboard.setDisasterOfficerCount(dmcDashboardService.getDisasterOfficerCount());
         dashboard.setPublicUserCount(dmcDashboardService.getDisasterPublicUserCount());
-
         // Disaster Marks for the last 30 days
         //   { date: "2024-04-01", value: 118 },
         dashboard.setDisasterMarkCounts(dmcDashboardService.getDisasterMarksCounts());
+        dashboard.setMarksCount(dmcDashboardService.getMarksCount());
 
 
         return dashboard;

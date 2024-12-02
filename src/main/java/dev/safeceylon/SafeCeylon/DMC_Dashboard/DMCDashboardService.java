@@ -72,4 +72,12 @@ public class DMCDashboardService {
         return disasterMarkCounts;
     }
 
+    public int getMarksCount(){
+        // 30 days before today
+        LocalDateTime today = LocalDateTime.now();
+        LocalDateTime startDate = today.minusDays(30).withHour(0).withMinute(0).withSecond(0);
+        LocalDateTime endDate = today.withHour(23).withMinute(59).withSecond(59);
+        return disasterRepository.countDisastersReportedOnDate(startDate, endDate);
+    }
+
 }

@@ -17,5 +17,6 @@ public class DMCDashboard {
     private int disasterOfficerCount;
     private int publicUserCount;
     private List<Map<String, Integer>> disasterMarkCounts;
+    private int marksCount;
 }
 
