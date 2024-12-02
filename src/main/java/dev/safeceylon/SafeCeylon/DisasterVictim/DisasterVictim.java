@@ -21,17 +21,14 @@ public class DisasterVictim {
     private String idVictim;
     private String idDisaster;
     @Enumerated(EnumType.STRING)
-    private DisasterType disasterType;
-    @Enumerated(EnumType.STRING)
     private VictimStatus victimStatus;
 
     public DisasterVictim() { }
 
     // Parameterized constructor
-    public DisasterVictim(String idVictim, String idDisaster, DisasterType disasterType, VictimStatus victimStatus) {
+    public DisasterVictim(String idVictim, String idDisaster, VictimStatus victimStatus) {
         this.idVictim = idVictim;
         this.idDisaster = idDisaster;
-        this.disasterType = disasterType;
         this.victimStatus = victimStatus;
     }
 

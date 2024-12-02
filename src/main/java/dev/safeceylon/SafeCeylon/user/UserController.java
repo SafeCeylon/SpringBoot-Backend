@@ -3,6 +3,11 @@ package dev.safeceylon.SafeCeylon.user;
 import dev.safeceylon.SafeCeylon.disastermanagement.Disaster;
 import dev.safeceylon.SafeCeylon.disastermanagement.DisasterRepository;
 import dev.safeceylon.SafeCeylon.shelterhospital.*;
+import dev.safeceylon.SafeCeylon.DisasterVictim.*;
+import dev.safeceylon.SafeCeylon.donations.*;
+import dev.safeceylon.SafeCeylon.notification.*;
+import dev.safeceylon.SafeCeylon.weather.*;
+import dev.safeceylon.SafeCeylon.landslide.*;
 import dev.safeceylon.SafeCeylon.util.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +22,7 @@ import java.util.UUID;
 import java.util.List;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +30,8 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 @RestController
 @RequestMapping("/api/users")
@@ -72,11 +80,69 @@ public class UserController {
         Map<String, List<?>> mapData = Map.of("disasters", disasters, "shelters", shelters, "hospitals", hospitals);
         return ResponseEntity.ok(mapData);
     }
+    
+    @Autowired
+    private DisasterVictimRepository disasterVictimRepository;
 
     @GetMapping("/all-disasters")
-    public List<Disaster> getAllDisastersNotResolved(){
-        return disasterRepository.findUnresolvedDisasters();
+    public List<Disaster> getAllDisastersUserNotPartOf(@RequestHeader("Authorization") String authorization){
+        System.out.println("All disasters request received");
+        String token = authorization.replace("Bearer ", "").trim(); // Extract the token part
+        String userId = JwtUtils.getUserIdFromToken(token);
+        Optional<User> userOptional = userRepository.findUserById(userId);
+        if (userOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
+        }
+        List<Disaster> disasters = disasterVictimRepository.findDisastersUserNotPartOf(userId);
+    
+        return disasters;
     }
+
+    @Autowired
+    private NotificationRepository notificationRepository;
+    
+    @GetMapping("/get-notifications")
+    public List<Notification> getNotifications(@RequestHeader("Authorization") String authorization) {
+        System.out.println("Get notifications request received");
+        String token = authorization.replace("Bearer ", "").trim(); // Extract the token part
+        String userId = JwtUtils.getUserIdFromToken(token);
+        Optional<User> userOptional = userRepository.findUserById(userId);
+        if (userOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
+        }
+        return notificationRepository.findUnclearedNotificationsByUserId(userId);
+    }
+
+    @Autowired
+    private WeatherReportRepository weatherReportRepository;
+
+    @GetMapping("/get-weather")
+    public List<WeatherReport> getWeatherData() {
+        System.out.println("Get weather request received");
+        // Get today's and tomorrow's dates
+        LocalDate today = LocalDate.now();
+        LocalDate tomorrow = today.plusDays(1);
+
+        // Format the dates to match your database format (e.g., "yyyy-MM-dd")
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String todayDate = today.format(formatter);
+        String tomorrowDate = tomorrow.format(formatter);
+
+        // Fetch and return today's and tomorrow's reports
+        return weatherReportRepository.findReportsForTodayAndTomorrow(todayDate, tomorrowDate);
+    }
+
+    @Autowired
+    private LandslideWarningRepository landslideWarningRepository;
+
+    @GetMapping("/disaster-data")
+    public List<LandslideWarning> getLandslideWarnings() {
+        System.out.println("Get disaster data request received");
+        return landslideWarningRepository.findAll();
+    }
+    
+
+    //POST /api/users
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register")
@@ -121,6 +187,49 @@ public class UserController {
         System.out.println("User data requested for: " + userOptional.get().getEmail());
         return userOptional.get();
     }
+
+    @PostMapping("/add-victim")
+    public ResponseEntity<Void> addVictim(@RequestHeader("Authorization") String authorization, @RequestBody Map<String, String> request) {
+        System.out.println("Add victim request received: " + request.get("disasterId"));
+        String token = authorization.replace("Bearer ", "").trim(); // Extract the token part
+        String userId = JwtUtils.getUserIdFromToken(token);
+        Optional<User> userOptional = userRepository.findUserById(userId);
+        if (userOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
+        }
+        User user = userOptional.get();
+        // Save the DisasterVictim entry
+        DisasterVictim disasterVictim = new DisasterVictim(
+            user.getId(),                      // idVictim
+            request.get("disasterId"),         // idDisaster
+            VictimStatus.ToReply               // victimStatus
+        );
+    
+        disasterVictimRepository.save(disasterVictim);
+    
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/clear-notification")
+    public ResponseEntity<Void> clearNotification(@RequestHeader("Authorization") String authorization, @RequestBody Map<String, String> request) {
+        System.out.println("Clear notification request received: " + request.get("notificationId"));
+        String token = authorization.replace("Bearer ", "").trim(); // Extract the token part
+        String userId = JwtUtils.getUserIdFromToken(token);
+        Optional<User> userOptional = userRepository.findUserById(userId);
+        if (userOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
+        }
+        String notificationId = request.get("notificationId");
+        Optional<Notification> notificationOptional = notificationRepository.findById(notificationId);
+        if (notificationOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Notification not found");
+        }
+        Notification notification = notificationOptional.get();
+        notification.setCleared(true);
+        notificationRepository.save(notification);
+        return ResponseEntity.ok().build();
+    }
+    
 
     // For example, if you're using a session-based approach
     @PostMapping("/logout")
@@ -197,6 +306,76 @@ public class UserController {
         disaster.setReportedBy("USER");
         disasterRepository.save(disaster);
         return ResponseEntity.ok("Disaster reported successfully");
+    }
+
+    @Autowired
+    private MonetaryDonationRepository monetaryDonationsRepository;
+
+    @Autowired
+    private SupplyDonationRepository supplyDonationsRepository;
+
+    @PostMapping("/add-mono-donation")
+    public ResponseEntity<String> addMonoDonation(@RequestHeader("Authorization") String authorization, @RequestBody Map<String, String> request) {
+        System.out.println("Mono donation request received: " + request.get("amount"));
+        String token = authorization.replace("Bearer ", "").trim(); // Extract the token part
+        String userId = JwtUtils.getUserIdFromToken(token);
+        Optional<User> userOptional = userRepository.findUserById(userId);
+        if (userOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
+        }
+        MonetaryDonation donation = new MonetaryDonation(
+            userOptional.get().getId(), // idDonor
+            Double.parseDouble(request.get("amount")) // amount
+        );
+        monetaryDonationsRepository.save(donation);
+        return ResponseEntity.ok("Donation added successfully");
+    }
+
+    @PostMapping("/add-sup-donation")
+    public ResponseEntity<String> addSupDonation(
+            @RequestHeader("Authorization") String authorization, 
+            @RequestBody Map<String, Object> request) {
+    
+        System.out.println("Sup donation request received: " + request);
+    
+        String token = authorization.replace("Bearer ", "").trim();
+        String userId = JwtUtils.getUserIdFromToken(token);
+        Optional<User> userOptional = userRepository.findUserById(userId);
+        if (userOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
+        }
+    
+        String item = (String) request.get("supplies");
+        if (item == null || item.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Supplies field is required");
+        }
+    
+        String amountStr = (String) request.get("quantity");
+        double quantity;
+        try {
+            quantity = Double.parseDouble(amountStr);
+        } catch (NumberFormatException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid quantity format");
+        }
+    
+        String dateStr = (String) request.get("date");
+        java.sql.Date date;
+        try {
+            date = java.sql.Date.valueOf(dateStr.split("T")[0]); // Convert ISO date to java.sql.Date
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date format");
+        }
+    
+        SupplyDonation donation = new SupplyDonation(
+            userOptional.get().getId(),  // idDonor
+            item,                       // supplies
+            quantity,                   // quantity
+            date                        // date
+        );
+        System.out.println("Donation: " + donation);
+        supplyDonationsRepository.save(donation);
+    
+        return ResponseEntity.ok("Donation added successfully");
     }
 
     //PUT /api/users
