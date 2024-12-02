@@ -406,4 +406,9 @@ public class UserController {
     public List<User> getDisasterAdminsAndOfficers() {
         return userRepository.findByRoleIn(Arrays.asList(UserRole.DISASTER_ADMIN, UserRole.DISASTER_OFFICER));
     }
+
+    @GetMapping("/meteorology")
+    public List<User> getMeteorologyAdminsAndOfficers() {
+        return userRepository.findByRoleIn(Arrays.asList(UserRole.METEOROLOGY_ADMIN, UserRole.METEOROLOGY_OFFICER));
+    }
 }
