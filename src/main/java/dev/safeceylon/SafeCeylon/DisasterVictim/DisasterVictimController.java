@@ -113,6 +113,13 @@ public class DisasterVictimController {
         return ResponseEntity.ok("Message sent successfully");
     }
 
+    @PostMapping("/chat/close")
+    public ResponseEntity<String> closeChat(@RequestBody Map<String, String> payload){
+        String UserId = payload.get("UserId");
+        disasterVictimService.changeVictimStatus(UserId, VictimStatus.Closed);
+        return ResponseEntity.ok("Chat closed successfully");
+    }
+
 
 
 
