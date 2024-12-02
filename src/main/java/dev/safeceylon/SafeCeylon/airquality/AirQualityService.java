@@ -1,5 +1,7 @@
-package dev.safeceylon.SafeCeylon.weather;
+package dev.safeceylon.SafeCeylon.airquality;
 
+import dev.safeceylon.SafeCeylon.landslide.LandslideWarning;
+import dev.safeceylon.SafeCeylon.landslide.LandslideWarningRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,17 +12,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class WeatherReportService {
-
-    private final WeatherReportRepository repository;
+public class AirQualityService {
+    private final AirQualityRepository repository;
 
     @Autowired
-    public WeatherReportService(WeatherReportRepository repository) {
+    public AirQualityService(AirQualityRepository repository) {
         this.repository = repository;
     }
 
-    public void saveWeatherReportsFromFile(File file) {
-        List<WeatherReport> weatherReports = new ArrayList<>();
+    public void saveAirQualityFromFile(File file) {
+        List<AirQuality> airQualityList = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             boolean isFirstLine = true;
@@ -34,21 +35,16 @@ public class WeatherReportService {
                 }
 
                 String[] columns = line.split(",");
-                WeatherReport report = new WeatherReport();
-                report.setDate(columns[0].trim());
-                report.setTimeIssued(columns[1].trim());
-                report.setProvince(columns[2].trim());
-                report.setDistrict(columns[3].trim());
-                report.setCondition(columns[4].trim());
-                report.setWindSpeeds(columns[5].trim());
-                report.setRainfallType(columns[6].trim());
+                AirQuality airQuality = new AirQuality();
+                airQuality.setDistrict(columns[0].trim());
+                airQuality.setAqi(Integer.parseInt(columns[1].trim()));
 
-                weatherReports.add(report);
+                airQualityList.add(airQuality);
             }
         } catch (Exception e) {
             throw new RuntimeException("Error while processing the file: " + e.getMessage());
         }
 
-        repository.saveAll(weatherReports);
+        repository.saveAll(airQualityList);
     }
 }
