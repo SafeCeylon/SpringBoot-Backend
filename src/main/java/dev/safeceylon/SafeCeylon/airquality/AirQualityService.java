@@ -25,6 +25,9 @@ public class AirQualityService {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             boolean isFirstLine = true;
+
+            repository.deleteAll(); // Clear all existing records
+
             while ((line = reader.readLine()) != null) {
                 if (isFirstLine) {
                     isFirstLine = false; // Skip header row

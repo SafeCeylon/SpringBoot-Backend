@@ -24,6 +24,7 @@ public class FloodWarningService {
     }
 
     public void saveFloodData(String path) {
+        repository.deleteAll(); // Clear all existing records
         FloodWarning floodData = new FloodWarning();
         floodData.setDateIssued(LocalDate.now().toString());
         floodData.setFilePath(path); // Store file path
