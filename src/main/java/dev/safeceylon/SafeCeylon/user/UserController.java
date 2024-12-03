@@ -123,17 +123,7 @@ public class UserController {
     @GetMapping("/get-weather")
     public List<WeatherReport> getWeatherData() {
         System.out.println("Get weather request received");
-        // Get today's and tomorrow's dates
-        LocalDate today = LocalDate.now();
-        LocalDate tomorrow = today.plusDays(1);
-
-        // Format the dates to match your database format (e.g., "yyyy-MM-dd")
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String todayDate = today.format(formatter);
-        String tomorrowDate = tomorrow.format(formatter);
-
-        // Fetch and return today's and tomorrow's reports
-        return weatherReportRepository.findReportsForTodayAndTomorrow(todayDate, tomorrowDate);
+        return weatherReportRepository.findAll();
     }
 
     @Autowired
