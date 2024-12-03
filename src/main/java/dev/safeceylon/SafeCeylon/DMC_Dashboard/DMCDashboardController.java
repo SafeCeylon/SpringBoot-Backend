@@ -30,7 +30,12 @@ public class DMCDashboardController {
         //   { date: "2024-04-01", value: 118 },
         dashboard.setDisasterMarkCounts(dmcDashboardService.getDisasterMarksCounts());
         dashboard.setMarksCount(dmcDashboardService.getMarksCount());
-
+        dashboard.setMonetaryDonations(dmcDashboardService.getMonetaryDonations());
+        dashboard.setSuppliesDonationsWater(dmcDashboardService.getSuppliesDonationsWater());
+        dashboard.setSuppliesDonationsFood(dmcDashboardService.getSuppliesDonationsFood());
+        dashboard.setSuppliesDonationsMedicalSupplies(dmcDashboardService.getSuppliesDonationsMedicalSupplies());
+        dashboard.setSuppliesDonationsClothing(dmcDashboardService.getSuppliesDonationsClothing());
+        dashboard.setSuppliesDonationsOther(dmcDashboardService.getSuppliesDonationsOther());
 
         return dashboard;
     }

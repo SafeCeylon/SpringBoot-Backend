@@ -18,5 +18,12 @@ public class DMCDashboard {
     private int publicUserCount;
     private List<Map<String, Integer>> disasterMarkCounts;
     private int marksCount;
+    private double monetaryDonations;
+    private double suppliesDonationsWater;
+    private double suppliesDonationsFood;
+    private double suppliesDonationsMedicalSupplies;
+    private double suppliesDonationsClothing;
+    private double suppliesDonationsOther;
+
 }
 

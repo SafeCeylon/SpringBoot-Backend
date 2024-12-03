@@ -3,6 +3,8 @@ package dev.safeceylon.SafeCeylon.DMC_Dashboard;
 import dev.safeceylon.SafeCeylon.DisasterVictim.DisasterVictimRepository;
 import dev.safeceylon.SafeCeylon.DisasterVictim.VictimStatus;
 import dev.safeceylon.SafeCeylon.disastermanagement.DisasterRepository;
+import dev.safeceylon.SafeCeylon.donations.MonetaryDonationRepository;
+import dev.safeceylon.SafeCeylon.donations.SupplyDonationRepository;
 import dev.safeceylon.SafeCeylon.user.UserRepository;
 import dev.safeceylon.SafeCeylon.user.UserRole;
 import org.springframework.data.jpa.repository.Query;
@@ -20,11 +22,15 @@ public class DMCDashboardService {
     private final DisasterVictimRepository disasterVictimRepository;
     private final UserRepository userRepository;
     private final DisasterRepository disasterRepository;
+    private final MonetaryDonationRepository monetaryDonationRepository;
+    private final SupplyDonationRepository supplyDonationRepository;
 
-    public DMCDashboardService(DisasterVictimRepository disasterVictimRepository, UserRepository userRepository, DisasterRepository disasterRepository) {
+    public DMCDashboardService(DisasterVictimRepository disasterVictimRepository, UserRepository userRepository, DisasterRepository disasterRepository, MonetaryDonationRepository monetaryDonationRepository, SupplyDonationRepository supplyDonationRepository) {
         this.disasterVictimRepository = disasterVictimRepository;
         this.userRepository = userRepository;
         this.disasterRepository = disasterRepository;
+        this.monetaryDonationRepository = monetaryDonationRepository;
+        this.supplyDonationRepository = supplyDonationRepository;
     }
 
     public float getDisasterVictimStatusToReplyCount(){
@@ -78,6 +84,41 @@ public class DMCDashboardService {
         LocalDateTime startDate = today.minusDays(30).withHour(0).withMinute(0).withSecond(0);
         LocalDateTime endDate = today.withHour(23).withMinute(59).withSecond(59);
         return disasterRepository.countDisastersReportedOnDate(startDate, endDate);
+    }
+
+    public double getMonetaryDonations(){
+        // get the sum of all amount field in the monetary donation table
+        return monetaryDonationRepository.getTotalDonations();
+    }
+
+    public double getSuppliesDonationsWater(){
+        // get the quantity of water donations
+        var q = supplyDonationRepository.getSuppliesDonationsWater();
+        return q == null ? 0 : q;
+    }
+
+    public double getSuppliesDonationsFood(){
+        // get the quantity of food donations
+        var q = supplyDonationRepository.getSuppliesDonationsFood();
+        return q == null ? 0 : q;
+    }
+
+    public double getSuppliesDonationsMedicalSupplies(){
+        // get the quantity of medical supplies donations
+        var q = supplyDonationRepository.getSuppliesDonationsMedicalSupplies();
+        return q == null ? 0 : q;
+    }
+
+    public double getSuppliesDonationsClothing(){
+        // get the quantity of clothing donations
+        var q = supplyDonationRepository.getSuppliesDonationsClothing();
+        return q == null ? 0 : q;
+    }
+
+    public double getSuppliesDonationsOther(){
+        // get the quantity of other supplies donations
+        var q = supplyDonationRepository.getSuppliesDonationsOther();
+        return q == null ? 0 : q;
     }
 
 }

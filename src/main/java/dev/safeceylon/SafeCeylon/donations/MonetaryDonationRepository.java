@@ -10,4 +10,7 @@ import dev.safeceylon.SafeCeylon.donations.MonetaryDonation;
 @Repository
 public interface MonetaryDonationRepository extends JpaRepository<MonetaryDonation, String> {
     // Additional query methods can be added if needed
+
+    @Query("SELECT SUM(amount) FROM MonetaryDonation")
+    public double getTotalDonations();
 }
