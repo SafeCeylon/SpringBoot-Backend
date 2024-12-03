@@ -23,13 +23,14 @@ public class Disaster {
 
     private double longitude;
     private double radius;
-    private String reportedBy;
 
     @Column(name = "reported_at")
     private LocalDateTime reportedAt;
 
     @Column(name = "resolved")
     private boolean resolved = false;
+
+    private String reportedBy;
 
     public Disaster() {}
 

@@ -1,10 +1,11 @@
 package dev.safeceylon.SafeCeylon.user;
 
 import jakarta.persistence.*;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -44,11 +45,22 @@ public class User {
     private Boolean isTwoFactorEnabled = false;
 
 
+    private Double longitude;
+
+    private Double latitude;
+
+    private String resetToken;
+
+    private Instant tokenExpiry;
+
+    // Getters and setters
+    // Constructor(s)
+    // Additional utility methods if needed
 
     public User() {}
 
     // Parameterized constructor
-    public User(String id, String name, String nic, String mobileNumber, String address, String email, LocalDateTime emailVerified, String image, String password, UserRole role, boolean isTwoFactorEnabled, String twoFactorConfirmation) {
+    public User(String id, String name, String nic, String mobileNumber, String address, String email, LocalDateTime emailVerified, String image, String password, UserRole role, boolean isTwoFactorEnabled, String twoFactorConfirmation, Double longitude, Double latitude) {
         this.id = id;
         this.name = name;
         this.nic = nic;
@@ -62,18 +74,11 @@ public class User {
         // this.accounts = accounts;
         this.isTwoFactorEnabled = isTwoFactorEnabled;
         this.twoFactorConfirmation = twoFactorConfirmation;
+        this.longitude = longitude;
+        this.latitude = latitude;
     }
-
-    // public List<Account> getAccounts() {
-    //     return accounts;
-    // }
-
-    // public void setAccounts(List<Account> accounts) {
-    //     this.accounts = accounts;
-    // }
 
     public Boolean isTwoFactorEnabled() {
         return isTwoFactorEnabled;
     }
-
 }
