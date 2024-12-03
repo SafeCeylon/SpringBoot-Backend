@@ -4,10 +4,14 @@ import dev.safeceylon.SafeCeylon.disastermanagement.Disaster;
 import dev.safeceylon.SafeCeylon.disastermanagement.DisasterRepository;
 import dev.safeceylon.SafeCeylon.shelterhospital.*;
 import dev.safeceylon.SafeCeylon.DisasterVictim.*;
+import dev.safeceylon.SafeCeylon.DisasterVictim.Chat.ChatMessageOwner;
+import dev.safeceylon.SafeCeylon.DisasterVictim.Chat.ChatService;
 import dev.safeceylon.SafeCeylon.donations.*;
 import dev.safeceylon.SafeCeylon.notification.*;
 import dev.safeceylon.SafeCeylon.weather.*;
 import dev.safeceylon.SafeCeylon.landslide.*;
+import dev.safeceylon.SafeCeylon.airquality.*;
+import dev.safeceylon.SafeCeylon.flood.*;
 import dev.safeceylon.SafeCeylon.util.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -140,7 +144,26 @@ public class UserController {
         System.out.println("Get disaster data request received");
         return landslideWarningRepository.findAll();
     }
-    
+
+    @Autowired
+    private AirQualityRepository airQualityRepository;
+
+    @GetMapping("/air-quality")
+    public List<AirQuality> getAirQualityData() {
+        System.out.println("Get air quality request received");
+        return airQualityRepository.findAll();
+    }
+
+    @Autowired
+    private ChatService chatService;
+
+    @GetMapping("/get-chat")
+    public List<Map<String, Object>> getChatMessages(@RequestHeader("Authorization") String authorization) {
+        System.out.println("Get chat request received");
+        String token = authorization.replace("Bearer ", "").trim(); // Extract the token part
+        String userId = JwtUtils.getUserIdFromToken(token);
+        return chatService.getChatMessages(userId);
+    }
 
     //POST /api/users
 
@@ -376,6 +399,19 @@ public class UserController {
         supplyDonationsRepository.save(donation);
     
         return ResponseEntity.ok("Donation added successfully");
+    }
+
+    @PostMapping("/send-message")
+    public ResponseEntity<String> sendMessage(@RequestHeader("Authorization") String authorization, @RequestBody Map<String, String> request) {
+        System.out.println("Message request received: " + request.get("message"));
+        String token = authorization.replace("Bearer ", "").trim(); // Extract the token part
+        String userId = JwtUtils.getUserIdFromToken(token);
+        Optional<User> userOptional = userRepository.findUserById(userId);
+        if (userOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
+        }
+        chatService.addChatMessageByOwner(userId, request.get("message"), ChatMessageOwner.VICTIM);
+        return ResponseEntity.ok("Message sent successfully");
     }
 
     //PUT /api/users
