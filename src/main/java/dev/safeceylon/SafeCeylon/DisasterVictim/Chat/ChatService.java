@@ -1,5 +1,6 @@
 package dev.safeceylon.SafeCeylon.DisasterVictim.Chat;
 
+import dev.safeceylon.SafeCeylon.DisasterVictim.VictimStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,8 @@ public class ChatService {
             return Collections.emptyList(); // Return an empty list in case of errors
         }
     }
+
+
 
     @Transactional
     public void addChatMessageByOwner(String IdVictim, String message, ChatMessageOwner owner) {

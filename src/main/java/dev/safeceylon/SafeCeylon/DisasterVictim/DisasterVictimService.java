@@ -100,4 +100,8 @@ public class DisasterVictimService {
     public User GetUserByVictimId(String id) {
         return userRepository.findUserById(id).orElse(null);
     }
+
+    public void changeVictimStatus(String id, VictimStatus victimStatus) {
+        disasterVictimRepository.updateVictimStatus(id, victimStatus);
+    }
 }

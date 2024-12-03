@@ -39,10 +39,34 @@ public class DisasterVictimController {
     }
 
 
-    @GetMapping("/chat-ToReply")
-    public Object getVictimsToReplyChatAndDetails(@RequestParam(value = "UserId", required = false) String UserId){
-        if(UserId == null){
-            List<User> victimsToReply =disasterVictimService.GetVictimUsersOfStatus(VictimStatus.ToReply);
+    // http://localhost:3000/disaster/disaster-victims/chat?UserId=123&Type=ToReply
+    // @GetMapping("/chat-ToReply")
+    @GetMapping("/chat")
+    public Object getVictimsToReplyChatAndDetails(@RequestParam String UserId, @RequestParam(required = false) String Type) {
+        System.out.println("UserId: " + UserId);
+        System.out.println("Type: " + Type);
+        if(Objects.equals(UserId, "null")){
+            List<User> victimsToReply;
+            switch (Type) {
+                case "ToReply":
+                    victimsToReply = disasterVictimService.GetVictimUsersOfStatus(VictimStatus.ToReply);
+                    System.out.println("in page ToReply");
+                    break;
+                case "Replied":
+                    victimsToReply = disasterVictimService.GetVictimUsersOfStatus(VictimStatus.Replied);
+                    System.out.println("in page Replied");
+                    break;
+                case "Closed":
+                    victimsToReply = disasterVictimService.GetVictimUsersOfStatus(VictimStatus.Closed);
+                    System.out.println("in page Closed");
+                    break;
+                default:
+                    victimsToReply = disasterVictimService.GetVictimUsersOfStatus(VictimStatus.ToReply);
+                    System.out.println("in page default");
+                    break;
+            }
+
+            // List<User> victimsToReply =disasterVictimService.GetVictimUsersOfStatus(VictimStatus.ToReply);
             return victimsToReply;  //
         }else {
             System.out.println("userId: " + UserId + "reponce"); // Ensure it's logged
@@ -62,14 +86,12 @@ public class DisasterVictimController {
             }
 
             User user = disasterVictimService.GetUserByVictimId(UserId);
-            System.out.println("User: " + user.getName());
             List<Disaster> disasterList = disasterVictimService.GetDisasterByVictimId(UserId);
-            System.out.println("Disasters: " + disasterList);
             List<Map<String, Object>> Chatmasages = chatService.getChatMessages(UserId);
-            System.out.println("Chat messages: " + Chatmasages);
+            ChatData chatData = new ChatData(user.getName(), disasterList, Chatmasages, user.getImage(), user.getMobileNumber(), user.getAddress(), user.getEmail());
 
-
-            ChatData chatData = new ChatData(user.getName(), disasterList, Chatmasages);
+            // change the status of the victim to replied
+            disasterVictimService.changeVictimStatus(UserId, VictimStatus.Replied);
 
             return chatData;
 
@@ -89,6 +111,13 @@ public class DisasterVictimController {
         chatService.addChatMessageByOwner(UserId, message, ChatMessageOwner.DMC_OFFICER);
 
         return ResponseEntity.ok("Message sent successfully");
+    }
+
+    @PostMapping("/chat/close")
+    public ResponseEntity<String> closeChat(@RequestBody Map<String, String> payload){
+        String UserId = payload.get("UserId");
+        disasterVictimService.changeVictimStatus(UserId, VictimStatus.Closed);
+        return ResponseEntity.ok("Chat closed successfully");
     }
 
 
