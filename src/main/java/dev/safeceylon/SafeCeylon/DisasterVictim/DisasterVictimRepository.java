@@ -29,6 +29,5 @@ public interface DisasterVictimRepository extends JpaRepository<DisasterVictim, 
     // join disaster table with disasterVictim table
     List<Disaster> findDisastersByIdVictim(String idVictim);
 
-
 }
 
