@@ -20,6 +20,7 @@ public class Disaster {
 
     private String type;
     private double latitude;
+
     private double longitude;
     private double radius;
 
