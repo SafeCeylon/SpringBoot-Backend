@@ -10,26 +10,10 @@ import java.util.*;
 @Service
 public class ChatService {
 
-    // Get the chat messages for the given victim
-    // Dynamically get the table name for the victim
-    // Get the chat messages from the table
-
     @Autowired
     private EntityManager entityManager;
 
-//    @Transactional
-//    public Map<String, String> getChatMessages(String IdVictim) {
-//        String tableName = "chat_dmc_" + IdVictim.replace("-", "_");
-//
-//        // Get the chat messages from the table
-//        String TableQuery = "SELECT * FROM " + tableName;
-//        // Execute the query and get the chat messages
-//        entityManager.createNativeQuery(TableQuery).getResultList();
-//        System.out.println("Chat messages for the victim with ID: " + IdVictim + " retrieved successfully!");
-//        System.out.println("Chat messages: " + entityManager.createNativeQuery(TableQuery).getResultList());
-//        return null;
-//    }
-
+    // Get the chat messages for the given victim dynamically by constructing the table name
     public List<Map<String, Object>> getChatMessages(String IdVictim) {
         String tableName = "chat_dmc_" + IdVictim.replace("-", "_");
 
@@ -61,13 +45,29 @@ public class ChatService {
         }
     }
 
+    // Add a chat message by owner to the victim's chat
     @Transactional
     public void addChatMessageByOwner(String IdVictim, String message, ChatMessageOwner owner) {
         String tableName = "chat_dmc_" + IdVictim.replace("-", "_");
 
         // Insert the chat message into the table
-        String TableQuery = "INSERT INTO " + tableName + " (owner, message) VALUES ('" + owner.toString() + "', '" + message + "')";
-        entityManager.createNativeQuery(TableQuery).executeUpdate();
+        String insertQuery = "INSERT INTO " + tableName + " (owner, message) VALUES ('" + owner.toString() + "', '" + message + "')";
+        entityManager.createNativeQuery(insertQuery).executeUpdate();
         System.out.println("Chat message added successfully!");
+    }
+
+    // Alternative method for getting messages using the ChatMessage entity class
+    public List<ChatMessage> getMessagesFromVictimChat(String IdVictim) {
+        String tableName = "chat_dmc_" + IdVictim.replace("-", "_");
+        String query = "SELECT * FROM " + tableName;
+        return entityManager.createNativeQuery(query, ChatMessage.class).getResultList();
+    }
+
+    // Alternative method for adding messages using the ChatMessage entity class
+    @Transactional
+    public void addMessageToVictimChat(String IdVictim, String message, ChatMessageOwner owner) {
+        String tableName = "chat_dmc_" + IdVictim.replace("-", "_");
+        String insertQuery = "INSERT INTO " + tableName + " (owner, message) VALUES ('" + owner.toString() + "', '" + message + "')";
+        entityManager.createNativeQuery(insertQuery).executeUpdate();
     }
 }
